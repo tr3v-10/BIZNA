@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bizna — Run your shop</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="toast-container"></div>
+
+<div id="login-screen" class="screen">
+  <div class="login-card">
+    <div class="login-mark">B</div>
+    <h1>Bizna</h1>
+    <p class="tagline">Sales · Stock · Expenses · Customers</p>
+    <form id="login-form">
+      <label>Username
+        <input type="text" id="login-username" required autocomplete="username">
+      </label>
+      <label>Password
+        <input type="password" id="login-password" required autocomplete="current-password">
+      </label>
+      <button type="submit" id="login-submit">
+        <span class="btn-label">Log in</span>
+        <span class="spinner hidden"></span>
+      </button>
+      <p id="login-error" class="error-text"></p>
+    </form>
+  </div>
+</div>
+
+<div id="app-screen" class="screen hidden">
+  <nav class="topbar">
+    <span class="brand">Bizna</span>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="dashboard">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M3 11l4-4 3 3 6-6M16 4h-3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Dashboard
+      </button>
+      <button class="tab-btn" data-tab="sales">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M4 4h1.5l1 9.5A1.5 1.5 0 008 15h6a1.5 1.5 0 001.5-1.3L16.5 7H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="14" cy="17.5" r="1" fill="currentColor"/></svg>
+        New sale
+      </button>
+      <button class="tab-btn" data-tab="products">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M3 6l7-3 7 3-7 3-7-3zM3 6v8l7 3 7-3V6M10 9v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Stock
+      </button>
+      <button class="tab-btn" data-tab="expenses">
+        <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v14M6 6.5c0-1.4 1.8-2.5 4-2.5s4 1.1 4 2.5-1.8 2.5-4 2.5-4 1.1-4 2.5 1.8 2.5 4 2.5 4-1.1 4-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Expenses
+      </button>
+      <button class="tab-btn" data-tab="customers">
+        <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6.5" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 17c0-3.3 3-5.5 6.5-5.5s6.5 2.2 6.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Customers
+      </button>
+    </div>
+    <button id="logout-btn" class="logout">Log out</button>
+  </nav>
+
+  <main>
+    <!-- Dashboard -->
+    <section id="tab-dashboard" class="tab-panel">
+      <div class="stat-grid">
+        <div class="stat-card"><span class="stat-label">Sales today</span><span class="stat-value" id="stat-today" data-raw="0">KES 0</span></div>
+        <div class="stat-card"><span class="stat-label">Total sales</span><span class="stat-value" id="stat-sales" data-raw="0">KES 0</span></div>
+        <div class="stat-card"><span class="stat-label">Total expenses</span><span class="stat-value" id="stat-expenses" data-raw="0">KES 0</span></div>
+        <div class="stat-card profit"><span class="stat-label">Profit</span><span class="stat-value" id="stat-profit" data-raw="0">KES 0</span></div>
+        <div class="stat-card"><span class="stat-label">Owed by customers</span><span class="stat-value" id="stat-credit" data-raw="0">KES 0</span></div>
+      </div>
+
+      <div class="panel">
+        <h3>Sales, last 7 days</h3>
+        <div id="sales-chart" class="chart-wrap"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Low stock</h3>
+        <ul id="low-stock-list" class="plain-list"><li class="skeleton-row"></li><li class="skeleton-row"></li></ul>
+      </div>
+    </section>
+
+    <!-- New sale -->
+    <section id="tab-sales" class="tab-panel hidden">
+      <h2>Record a sale</h2>
+      <div id="sale-items"></div>
+      <button id="add-item-row" type="button" class="secondary">+ Add product</button>
+      <label>Customer (optional)
+        <select id="sale-customer"><option value="">Walk-in</option></select>
+      </label>
+      <label>Amount paid
+        <input type="number" id="sale-amount-paid" min="0" step="0.01" required>
+      </label>
+      <label>Payment method
+        <div class="method-picker" id="sale-payment-method" data-value="cash">
+          <button type="button" class="method-btn active" data-value="cash">Cash</button>
+          <button type="button" class="method-btn" data-value="mpesa">M-Pesa</button>
+          <button type="button" class="method-btn" data-value="card">Card</button>
+          <button type="button" class="method-btn" data-value="credit">Credit</button>
+        </div>
+      </label>
+      <div class="sale-total-row">
+        <span>Total</span>
+        <strong id="sale-total">KES 0</strong>
+      </div>
+      <button id="submit-sale">
+        <span class="btn-label">Complete sale</span>
+        <span class="spinner hidden"></span>
+      </button>
+      <p id="sale-message" class="feedback"></p>
+      <h3>Recent sales</h3>
+      <ul id="recent-sales-list" class="plain-list"></ul>
+    </section>
+
+    <!-- Products / stock -->
+    <section id="tab-products" class="tab-panel hidden">
+      <h2>Products</h2>
+      <form id="product-form" class="inline-form">
+        <input type="text" id="product-name" placeholder="Product name" required>
+        <input type="number" id="product-price" placeholder="Price" min="0" step="0.01" required>
+        <input type="number" id="product-stock" placeholder="Stock qty" min="0" step="1" value="0">
+        <button type="submit">Add product</button>
+      </form>
+      <table id="products-table">
+        <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Expenses -->
+    <section id="tab-expenses" class="tab-panel hidden">
+      <h2>Expenses</h2>
+      <form id="expense-form" class="inline-form">
+        <input type="text" id="expense-category" placeholder="Category (e.g. rent, supplies)" required>
+        <input type="text" id="expense-description" placeholder="Description (optional)">
+        <input type="number" id="expense-amount" placeholder="Amount" min="0" step="0.01" required>
+        <button type="submit">Add expense</button>
+      </form>
+      <table id="expenses-table">
+        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Customers -->
+    <section id="tab-customers" class="tab-panel hidden">
+      <h2>Customers</h2>
+      <form id="customer-form" class="inline-form">
+        <input type="text" id="customer-name" placeholder="Name" required>
+        <input type="text" id="customer-phone" placeholder="Phone (optional)">
+        <button type="submit">Add customer</button>
+      </form>
+      <table id="customers-table">
+        <thead><tr><th>Name</th><th>Phone</th><th>Owes</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+</div>
+
+<!-- Confirm dialog, reused for any destructive action -->
+<div id="confirm-modal" class="modal-backdrop hidden">
+  <div class="modal-card">
+    <p id="confirm-message">Are you sure?</p>
+    <div class="modal-actions">
+      <button id="confirm-cancel" class="secondary">Cancel</button>
+      <button id="confirm-ok" class="danger">Remove</button>
+    </div>
+  </div>
+</div>
+
+<!-- Payment amount dialog, replaces window.prompt -->
+<div id="payment-modal" class="modal-backdrop hidden">
+  <div class="modal-card">
+    <p>Payment amount received</p>
+    <input type="number" id="payment-amount-input" min="0.01" step="0.01" autofocus>
+    <div class="modal-actions">
+      <button id="payment-cancel" class="secondary">Cancel</button>
+      <button id="payment-ok">Record</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

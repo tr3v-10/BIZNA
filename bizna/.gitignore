@@ -1,0 +1,6 @@
+node_modules/
+.env
+bizna.db
+bizna.db-shm
+bizna.db-wal
+*.log
