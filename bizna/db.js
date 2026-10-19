@@ -1,13 +1,19 @@
-// db.js
-// Single SQLite connection shared across the app.
-// Schema is created here so the app works out of the box with zero setup.
+/**
+ * SQLite connection, schema and lightweight migrations.
+ *
+ * Exports a single shared better-sqlite3 instance. Tables are created on load
+ * and columns added in later versions are applied with addColumn(), so an
+ * existing bizna.db upgrades in place.
+ *
+ * The database file defaults to ./bizna.db. Set BIZNA_DB to move it, or to
+ * ":memory:" for throwaway runs such as the test suite.
+ */
 
 const Database = require('better-sqlite3');
 const path = require('path');
 
-const db = new Database(path.join(__dirname, 'bizna.db'));
+const db = new Database(process.env.BIZNA_DB || path.join(__dirname, 'bizna.db'));
 
-// SQLite pragma tuning: keeps writes safe while staying fast on a single file.
 db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
@@ -54,6 +60,13 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
 
+  CREATE TABLE IF NOT EXISTS customer_payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE SET NULL,
+    amount REAL NOT NULL CHECK (amount > 0),
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT NOT NULL UNIQUE,
@@ -61,6 +74,72 @@ db.exec(`
     role TEXT NOT NULL DEFAULT 'owner',
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+
+  CREATE TABLE IF NOT EXISTS sessions (
+    token_hash TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at INTEGER NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS wallet_buckets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    percent REAL NOT NULL CHECK (percent > 0 AND percent <= 100),
+    color TEXT NOT NULL,
+    sort INTEGER NOT NULL DEFAULT 0,
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS wallet_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    kind TEXT NOT NULL,
+    direction TEXT NOT NULL CHECK (direction IN ('in', 'out', 'move')),
+    label TEXT NOT NULL,
+    amount REAL NOT NULL CHECK (amount > 0),
+    ref_type TEXT,
+    ref_id INTEGER,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+
+  CREATE TABLE IF NOT EXISTS wallet_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_id INTEGER NOT NULL REFERENCES wallet_events(id) ON DELETE CASCADE,
+    bucket_id INTEGER REFERENCES wallet_buckets(id),
+    amount REAL NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_sales_created ON sales(created_at);
+  CREATE INDEX IF NOT EXISTS idx_expenses_created ON expenses(created_at);
+  CREATE INDEX IF NOT EXISTS idx_sale_items_sale ON sale_items(sale_id);
+  CREATE INDEX IF NOT EXISTS idx_wallet_events_created ON wallet_events(created_at);
+  CREATE INDEX IF NOT EXISTS idx_wallet_events_ref ON wallet_events(ref_type, ref_id);
+  CREATE INDEX IF NOT EXISTS idx_wallet_entries_event ON wallet_entries(event_id);
+  CREATE INDEX IF NOT EXISTS idx_wallet_entries_bucket ON wallet_entries(bucket_id);
 `);
+
+/**
+ * Adds a column when it does not exist yet.
+ * @param {string} table
+ * @param {string} column
+ * @param {string} definition SQL type and constraints, e.g. "TEXT"
+ */
+function addColumn(table, column, definition) {
+  const exists = db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === column);
+  if (!exists) db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+}
+
+addColumn('users', 'terms_accepted_at', 'TEXT');
+addColumn('users', 'terms_version', 'TEXT');
+addColumn('users', 'email', 'TEXT');
+addColumn('users', 'shop_name', 'TEXT');
+addColumn('expenses', 'bucket_id', 'INTEGER REFERENCES wallet_buckets(id)');
+
+db.exec('CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email) WHERE email IS NOT NULL');
 
 module.exports = db;

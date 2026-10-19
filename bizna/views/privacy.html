@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy notice - Bizna</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="legal-body">
+<header class="legal-top">
+  <a class="brand brand-dark" href="/"><img src="/favicon.svg" alt="" width="28" height="28">Bizna</a>
+  <a class="legal-switch" href="/terms">Terms and Conditions</a>
+</header>
+<main class="legal">
+  <h1>Privacy notice</h1>
+  <p class="legal-meta">Version {{VERSION}}. In force from {{EFFECTIVE_DATE}}.</p>
+
+  <aside class="legal-summary">
+    <h2>The short version</h2>
+    <ul>
+      <li>Bizna stores what you type into it, plus your email and a hashed password. Nothing else about you is collected.</li>
+      <li>There is no advertising, no analytics and no third-party tracking in the app.</li>
+      <li>You can ask for a copy of your data, a correction or deletion at any time.</li>
+    </ul>
+  </aside>
+
+  <h2>1. Who is responsible for your data</h2>
+  <p>{{OPERATOR_NAME}} (the Operator) runs this installation and decides how it is hosted. Contact: {{CONTACT}}. For the records you enter about your own customers, you decide what to record and why, and the Operator only stores it for you.</p>
+
+  <h2>2. What is stored</h2>
+  <ul>
+    <li><strong>Your account:</strong> shop name, email address, a bcrypt hash of your password (the password itself is never stored), when you accepted the terms and which version.</li>
+    <li><strong>Your business records:</strong> products and stock levels, sales and their items, expenses, wallet pots, rules and movements, customer names, phone numbers, balances and repayments.</li>
+    <li><strong>Sessions:</strong> a hash of your sign-in token and its expiry time. Tokens last 12 hours.</li>
+  </ul>
+  <p>Bizna does not collect your location, contacts, device identifiers or browsing history, and it does not read your M-Pesa or bank accounts.</p>
+
+  <h2>3. Why it is stored</h2>
+  <p>Only to run the service you asked for: to sign you in, to calculate your sales, stock, credit and wallet figures, and to show them back to you. Bizna does not use your data for advertising, profiling or sale to anyone.</p>
+
+  <h2>4. What is saved in your browser</h2>
+  <p>Bizna keeps your sign-in token in your browser's local storage so you stay signed in. It is removed when you log out or the session ends. Bizna sets no tracking cookies. Fonts are served by the installation itself, not by a third party.</p>
+
+  <h2>5. Who can see it</h2>
+  <p>You, and whoever administers the server this installation runs on, who can technically access the database. The Operator does not share your data with others unless the law requires it.</p>
+
+  <h2>6. How long it is kept</h2>
+  <p>For as long as your account exists. When you ask for your account to be deleted, your records are removed from the live database, and from backups as those backups are replaced.</p>
+
+  <h2>7. How it is protected</h2>
+  <p>Passwords are hashed, sign-in tokens are stored only as hashes, requests are validated, and sign-in attempts are rate limited. Protection in transit depends on the Operator serving Bizna over HTTPS, which is strongly recommended. If a breach puts your data at risk, the Operator will tell you and the authorities as the law requires.</p>
+
+  <h2>8. Your rights</h2>
+  <p>Under the Data Protection Act, 2019 of Kenya you can ask to see the personal data held about you, to have it corrected, to have it deleted, to object to how it is used, and to receive a copy in a usable format. Write to {{CONTACT}}. If you are unhappy with the answer, you can complain to the Office of the Data Protection Commissioner.</p>
+
+  <h2>9. Your customers' data</h2>
+  <p>If you record customers' names and phone numbers, the law may require you to have a lawful reason, to tell those customers what you keep, to keep it accurate and secure, and, depending on your business, to register with the Data Protection Commissioner. Record only what you need.</p>
+
+  <h2>10. Changes</h2>
+  <p>This notice may be updated. The version and date at the top show the latest text.</p>
+</main>
+<footer class="legal-foot">
+  <a href="/">Back to Bizna</a>
+  <a href="/terms">Terms and Conditions</a>
+</footer>
+</body>
+</html>

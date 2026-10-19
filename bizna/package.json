@@ -1,11 +1,13 @@
 {
   "name": "bizna",
-  "version": "1.0.0",
-  "description": "MVP business management system for Kenyan SMEs - Sales, Inventory, Expenses, Customers, Dashboard",
+  "version": "2.0.0",
+  "description": "Business manager for small shops: sales, stock, expenses, customers and a live wallet that splits money into pots automatically.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node --watch server.js",
+    "test": "node --test test/api.test.js",
+    "reset-password": "node scripts/reset-password.js"
   },
   "dependencies": {
     "express": "^4.19.2",
@@ -16,5 +18,8 @@
     "bcryptjs": "^2.4.3",
     "express-validator": "^7.2.0",
     "express-rate-limit": "^7.4.0"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }

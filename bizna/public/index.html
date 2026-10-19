@@ -2,186 +2,443 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bizna — Run your shop</title>
-<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A3D2E">
+<meta name="description" content="Bizna records your shop's sales, stock and expenses, and splits every payment into pots for restock, rent, savings and your own pay.">
+<title>Bizna: sales, stock and money tracking for your shop</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/bricolage-grotesque.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div id="toast-container"></div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></symbol>
+    <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"/><circle cx="16.5" cy="14" r="1.2"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.3a1 1 0 0 0 1-.8L21 7H6"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/></symbol>
+    <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.8c1.8.7 3 2.4 3 5.2"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+    <symbol id="i-swap" viewBox="0 0 24 24"><path d="m7 4-4 4 4 4M3 8h14M17 20l4-4-4-4M21 16H7"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+    <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 5.1A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4M6.5 6.6C3.7 8.4 2 12 2 12s3.5 7 10 7c1.7 0 3.2-.4 4.5-1M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v5M12 18v.01"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m3 17 5-5 4 4 8-9"/><path d="M15 7h5v5"/></symbol>
+  </defs>
+</svg>
 
-<div id="login-screen" class="screen">
-  <div class="login-card">
-    <div class="login-mark">B</div>
-    <h1>Bizna</h1>
-    <p class="tagline">Sales · Stock · Expenses · Customers</p>
-    <form id="login-form">
-      <label>Username
-        <input type="text" id="login-username" required autocomplete="username">
+<div id="toast-region" class="toast-region" role="status" aria-live="polite"></div>
+<div id="notice" class="notice" role="alert" hidden></div>
+
+<div id="view-landing" class="view landing" hidden>
+  <header class="l-nav">
+    <a class="brand brand-dark" href="#/"><img src="favicon.svg" alt="" width="30" height="30">Bizna</a>
+    <nav class="l-links" aria-label="Sections">
+      <a href="#/features">What it does</a>
+      <a href="#/how">How the wallet works</a>
+    </nav>
+    <div class="l-actions">
+      <a class="btn quiet" href="#/login">Log in</a>
+      <a class="btn primary" href="#/signup" data-signup-cta>Create account</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Know where every shilling goes.</h1>
+      <p class="lede">Bizna records your sales, stock and expenses, then splits every payment into the pots you choose: restock, rent, savings, your own pay. Watch each balance move as money comes in and goes out.</p>
+      <div class="hero-cta">
+        <a class="btn primary lg" href="#/signup" data-signup-cta>Create your shop account</a>
+        <a class="btn secondary lg" href="#/demo">Look inside with sample data</a>
+      </div>
+      <p class="hero-note" id="landing-note" hidden></p>
+    </div>
+
+    <div class="splitter" aria-labelledby="sp-title">
+      <div class="splitter-head">
+        <h2 id="sp-title">Try it: an example wallet</h2>
+        <span class="pill pill-sun">Sample figures</span>
+      </div>
+      <div class="splitter-total">
+        <span class="label">In the wallet</span>
+        <strong id="sp-total">KES 0</strong>
+      </div>
+      <div class="stack" id="sp-stack" role="img" aria-label="How the wallet is divided between pots"></div>
+      <ul class="sp-pots" id="sp-pots"></ul>
+      <div class="sp-actions">
+        <p class="sp-hint">Tap a sale and watch it divide by the rules above.</p>
+        <div class="chips" id="sp-chips">
+          <button type="button" class="chip" data-amount="320">Sugar, 2kg: KES 320</button>
+          <button type="button" class="chip" data-amount="650">Cooking oil: KES 650</button>
+          <button type="button" class="chip" data-amount="1500">Weekly order: KES 1,500</button>
+        </div>
+        <div class="sp-row">
+          <button type="button" class="chip chip-out" id="sp-spend">Spend KES 200 from Restock</button>
+          <button type="button" class="link-btn" id="sp-reset">Start over</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="l-section" id="features" aria-labelledby="features-title">
+    <h2 id="features-title">Everything a duka needs, and nothing it doesn't.</h2>
+    <dl class="features">
+      <div class="feature f-green"><svg class="icon"><use href="#i-wallet"/></svg><dt>A wallet that divides itself</dt><dd>Set the percentages once. Every payment you receive is divided into your pots, and every expense comes out of the pot you pick.</dd></div>
+      <div class="feature f-sky"><svg class="icon"><use href="#i-trend"/></svg><dt>Live money figures</dt><dd>Money in, money out, the balance of each pot and how many days your cash will last at your recent pace, updated the moment a sale is saved.</dd></div>
+      <div class="feature f-sun"><svg class="icon"><use href="#i-cart"/></svg><dt>Fast sales</dt><dd>Add several products to one sale, take cash, M-Pesa or card, or put the unpaid part on a customer's tab.</dd></div>
+      <div class="feature f-coral"><svg class="icon"><use href="#i-box"/></svg><dt>Stock that keeps itself honest</dt><dd>Stock drops with every sale. Set an alert level per product and restock with one tap when a delivery arrives.</dd></div>
+      <div class="feature f-violet"><svg class="icon"><use href="#i-users"/></svg><dt>Customer credit</dt><dd>See who owes what and record repayments. Repayments flow into your wallet like any other payment.</dd></div>
+      <div class="feature f-teal"><svg class="icon"><use href="#i-receipt"/></svg><dt>Expenses by pot</dt><dd>Log rent, supplies and transport against the pot that pays for them, so you can see which pot is running low.</dd></div>
+    </dl>
+  </section>
+
+  <section class="l-section l-how" id="how" aria-labelledby="how-title">
+    <h2 id="how-title">How the wallet works</h2>
+    <ol class="steps">
+      <li><h3>You set the rules</h3><p>Name your pots and give each a share, for example Restock 50%, Rent and bills 20%, Savings 15%, Owner pay 15%. Anything you leave unassigned stays as Unallocated.</p></li>
+      <li><h3>Money arrives</h3><p>A sale payment or a customer repayment is saved, and the amount is divided across the pots to the cent. Unpaid credit does not enter the wallet until the customer pays.</p></li>
+      <li><h3>You spend from a pot</h3><p>Record an expense against a pot and its balance drops. If a pot runs dry you will see it go negative, so you know exactly where the pressure is.</p></li>
+    </ol>
+  </section>
+
+  <section class="demo-band">
+    <div>
+      <h2>See it with sample data first.</h2>
+      <p>No account and nothing saved. Add sales, record expenses and watch the wallet move.</p>
+    </div>
+    <a class="btn dark lg" href="#/demo">Open the demo</a>
+  </section>
+
+  <footer class="l-foot">
+    <span class="brand brand-dark"><img src="favicon.svg" alt="" width="26" height="26">Bizna</span>
+    <p>Built for small businesses in Kenya. Runs on your own server, and your records stay in your own database.</p>
+    <nav aria-label="Legal"><a href="/terms">Terms and Conditions</a><a href="/privacy">Privacy notice</a></nav>
+  </footer>
+</div>
+
+<div id="view-auth" class="view auth" hidden>
+  <div class="auth-main">
+    <a class="back-link" href="#/"><svg class="icon"><use href="#i-back"/></svg>Home</a>
+    <a class="brand brand-dark" href="#/"><img src="favicon.svg" alt="" width="30" height="30">Bizna</a>
+
+    <div class="seg" role="tablist" aria-label="Account">
+      <a id="auth-tab-login" href="#/login" role="tab">Log in</a>
+      <a id="auth-tab-signup" href="#/signup" role="tab">Create account</a>
+    </div>
+
+    <form id="login-form" class="auth-form">
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to see your shop.</p>
+      <div class="field">
+        <label for="login-id">Email or username</label>
+        <input id="login-id" name="login" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Password</label>
+        <div class="pw">
+          <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" aria-label="Show password" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button>
+        </div>
+      </div>
+      <p class="form-error" id="login-error" role="alert"></p>
+      <button class="btn primary lg block" type="submit">Log in</button>
+      <details class="forgot">
+        <summary>Forgot your password?</summary>
+        <p>Bizna does not send recovery emails. Ask whoever runs your server to run <code>npm run reset-password -- your@email.com NewPassword123</code> in the project folder, then log in with the new password.</p>
+      </details>
+    </form>
+
+    <form id="signup-form" class="auth-form" hidden>
+      <h1>Set up your shop</h1>
+      <p class="sub">It takes a minute. You get four starter pots for your wallet that you can change at any time.</p>
+      <p class="callout" id="signup-closed" hidden>This installation already has a shop account. <a href="#/login">Log in instead.</a></p>
+      <div class="field">
+        <label for="su-shop">Shop name</label>
+        <input id="su-shop" name="shop_name" type="text" maxlength="80" autocomplete="organization" required>
+      </div>
+      <div class="field">
+        <label for="su-email">Email</label>
+        <input id="su-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" required>
+        <span class="hint">You will use this to log in.</span>
+      </div>
+      <div class="field">
+        <label for="su-password">Password</label>
+        <div class="pw">
+          <input id="su-password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+          <button type="button" class="pw-toggle" aria-label="Show password" aria-pressed="false"><svg class="icon"><use href="#i-eye"/></svg></button>
+        </div>
+        <span class="hint">At least 8 characters.</span>
+      </div>
+      <div class="field">
+        <label for="su-confirm">Confirm password</label>
+        <input id="su-confirm" name="confirm" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+      </div>
+      <label class="check">
+        <input id="su-terms" name="terms" type="checkbox" required>
+        <span>I have read and accept the <a href="/terms" target="_blank" rel="noopener">Terms and Conditions</a> and the <a href="/privacy" target="_blank" rel="noopener">Privacy notice</a>.</span>
       </label>
-      <label>Password
-        <input type="password" id="login-password" required autocomplete="current-password">
-      </label>
-      <button type="submit" id="login-submit">
-        <span class="btn-label">Log in</span>
-        <span class="spinner hidden"></span>
-      </button>
-      <p id="login-error" class="error-text"></p>
+      <p class="form-error" id="signup-error" role="alert"></p>
+      <button class="btn primary lg block" type="submit">Create my account</button>
     </form>
   </div>
+
+  <aside class="auth-aside">
+    <div class="auth-aside-inner">
+      <h2>Your shop's money, split and tracked as it moves.</h2>
+      <ul>
+        <li>Every payment is divided into your pots automatically.</li>
+        <li>Spending comes out of the pot you choose, and overspending shows up straight away.</li>
+        <li>Sales, stock, credit and expenses live in one place that works on your phone.</li>
+      </ul>
+      <a class="btn dark" href="#/demo">Look inside with sample data</a>
+    </div>
+  </aside>
 </div>
 
-<div id="app-screen" class="screen hidden">
-  <nav class="topbar">
-    <span class="brand">Bizna</span>
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="dashboard">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 11l4-4 3 3 6-6M16 4h-3v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Dashboard
-      </button>
-      <button class="tab-btn" data-tab="sales">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M4 4h1.5l1 9.5A1.5 1.5 0 008 15h6a1.5 1.5 0 001.5-1.3L16.5 7H6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="17.5" r="1" fill="currentColor"/><circle cx="14" cy="17.5" r="1" fill="currentColor"/></svg>
-        New sale
-      </button>
-      <button class="tab-btn" data-tab="products">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M3 6l7-3 7 3-7 3-7-3zM3 6v8l7 3 7-3V6M10 9v8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Stock
-      </button>
-      <button class="tab-btn" data-tab="expenses">
-        <svg viewBox="0 0 20 20" fill="none"><path d="M10 3v14M6 6.5c0-1.4 1.8-2.5 4-2.5s4 1.1 4 2.5-1.8 2.5-4 2.5-4 1.1-4 2.5 1.8 2.5 4 2.5 4-1.1 4-2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Expenses
-      </button>
-      <button class="tab-btn" data-tab="customers">
-        <svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6.5" r="3" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 17c0-3.3 3-5.5 6.5-5.5s6.5 2.2 6.5 5.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-        Customers
-      </button>
+<div id="view-app" class="view app" hidden>
+  <aside class="sidebar">
+    <a class="brand" href="#/overview"><img src="favicon.svg" alt="" width="30" height="30">Bizna</a>
+    <div class="shop-chip"><span id="shop-name">My shop</span><span class="pill pill-sun" id="demo-chip" hidden>Demo</span></div>
+    <nav class="nav" aria-label="Main">
+      <a href="#/overview" data-route="overview"><svg class="icon"><use href="#i-home"/></svg>Overview</a>
+      <a href="#/wallet" data-route="wallet"><svg class="icon"><use href="#i-wallet"/></svg>Wallet</a>
+      <a href="#/sell" data-route="sell"><svg class="icon"><use href="#i-cart"/></svg>New sale</a>
+      <a href="#/stock" data-route="stock"><svg class="icon"><use href="#i-box"/></svg>Stock</a>
+      <a href="#/expenses" data-route="expenses"><svg class="icon"><use href="#i-receipt"/></svg>Expenses</a>
+      <a href="#/customers" data-route="customers"><svg class="icon"><use href="#i-users"/></svg>Customers</a>
+    </nav>
+    <div class="sidebar-foot">
+      <a href="/terms" target="_blank" rel="noopener">Terms</a>
+      <a href="/privacy" target="_blank" rel="noopener">Privacy</a>
+      <button type="button" class="side-logout" data-logout><svg class="icon"><use href="#i-logout"/></svg>Log out</button>
     </div>
-    <button id="logout-btn" class="logout">Log out</button>
-  </nav>
+  </aside>
 
-  <main>
-    <!-- Dashboard -->
-    <section id="tab-dashboard" class="tab-panel">
-      <div class="stat-grid">
-        <div class="stat-card"><span class="stat-label">Sales today</span><span class="stat-value" id="stat-today" data-raw="0">KES 0</span></div>
-        <div class="stat-card"><span class="stat-label">Total sales</span><span class="stat-value" id="stat-sales" data-raw="0">KES 0</span></div>
-        <div class="stat-card"><span class="stat-label">Total expenses</span><span class="stat-value" id="stat-expenses" data-raw="0">KES 0</span></div>
-        <div class="stat-card profit"><span class="stat-label">Profit</span><span class="stat-value" id="stat-profit" data-raw="0">KES 0</span></div>
-        <div class="stat-card"><span class="stat-label">Owed by customers</span><span class="stat-value" id="stat-credit" data-raw="0">KES 0</span></div>
-      </div>
+  <div class="content">
+    <header class="mobile-bar">
+      <a class="brand brand-dark" href="#/overview"><img src="favicon.svg" alt="" width="28" height="28">Bizna</a>
+      <button type="button" class="icon-btn" data-logout aria-label="Log out"><svg class="icon"><use href="#i-logout"/></svg></button>
+    </header>
 
-      <div class="panel">
-        <h3>Sales, last 7 days</h3>
-        <div id="sales-chart" class="chart-wrap"></div>
-      </div>
+    <div class="demo-banner" id="demo-banner" hidden>
+      <p>You are exploring sample data. Nothing you do here is saved.</p>
+      <div><a class="btn dark sm" href="#/signup" data-exit-demo>Create my account</a><button type="button" class="btn quiet sm" data-logout>Leave demo</button></div>
+    </div>
 
-      <div class="panel">
-        <h3>Low stock</h3>
-        <ul id="low-stock-list" class="plain-list"><li class="skeleton-row"></li><li class="skeleton-row"></li></ul>
-      </div>
-    </section>
-
-    <!-- New sale -->
-    <section id="tab-sales" class="tab-panel hidden">
-      <h2>Record a sale</h2>
-      <div id="sale-items"></div>
-      <button id="add-item-row" type="button" class="secondary">+ Add product</button>
-      <label>Customer (optional)
-        <select id="sale-customer"><option value="">Walk-in</option></select>
-      </label>
-      <label>Amount paid
-        <input type="number" id="sale-amount-paid" min="0" step="0.01" required>
-      </label>
-      <label>Payment method
-        <div class="method-picker" id="sale-payment-method" data-value="cash">
-          <button type="button" class="method-btn active" data-value="cash">Cash</button>
-          <button type="button" class="method-btn" data-value="mpesa">M-Pesa</button>
-          <button type="button" class="method-btn" data-value="card">Card</button>
-          <button type="button" class="method-btn" data-value="credit">Credit</button>
+    <main class="pages">
+      <section id="page-overview" class="page" hidden>
+        <header class="page-head">
+          <div><h1 id="greeting">Overview</h1><p class="sub" id="today-label"></p></div>
+          <a class="btn primary" href="#/sell"><svg class="icon"><use href="#i-plus"/></svg>New sale</a>
+        </header>
+        <div class="tiles">
+          <div class="tile"><span class="label">Sales today</span><strong class="num" id="ov-today" data-raw="0">KES 0</strong><span class="meta" id="ov-today-count"></span></div>
+          <div class="tile tile-wallet"><span class="label">In your wallet</span><strong class="num" id="ov-balance" data-raw="0">KES 0</strong><span class="meta" id="ov-balance-meta"></span></div>
+          <div class="tile"><span class="label">Spent today</span><strong class="num num-out" id="ov-out" data-raw="0">KES 0</strong><span class="meta" id="ov-out-meta"></span></div>
+          <div class="tile"><span class="label">Owed by customers</span><strong class="num" id="ov-credit" data-raw="0">KES 0</strong><span class="meta" id="ov-credit-meta"></span></div>
         </div>
-      </label>
-      <div class="sale-total-row">
-        <span>Total</span>
-        <strong id="sale-total">KES 0</strong>
-      </div>
-      <button id="submit-sale">
-        <span class="btn-label">Complete sale</span>
-        <span class="spinner hidden"></span>
-      </button>
-      <p id="sale-message" class="feedback"></p>
-      <h3>Recent sales</h3>
-      <ul id="recent-sales-list" class="plain-list"></ul>
-    </section>
+        <div class="grid-2">
+          <section class="panel"><h2>Sales, last 7 days</h2><div id="ov-chart" class="bars" role="img" aria-label="Bar chart of sales for the last seven days"></div></section>
+          <section class="panel">
+            <div class="panel-head"><h2>Wallet at a glance</h2><a class="link" href="#/wallet">Open wallet</a></div>
+            <div class="stack" id="ov-stack"></div>
+            <ul class="pot-lines" id="ov-pots"></ul>
+          </section>
+          <section class="panel"><h2>Best sellers, last 30 days</h2><ul class="rows" id="ov-best"></ul></section>
+          <section class="panel"><h2>Low stock</h2><ul class="rows" id="ov-low"></ul></section>
+          <section class="panel"><h2>Who owes you</h2><ul class="rows" id="ov-debtors"></ul></section>
+          <section class="panel">
+            <h2>All time</h2>
+            <dl class="trio">
+              <div><dt>Total sales</dt><dd id="ov-total-sales">KES 0</dd></div>
+              <div><dt>Total expenses</dt><dd id="ov-total-expenses">KES 0</dd></div>
+              <div><dt>Sales minus expenses</dt><dd id="ov-profit">KES 0</dd></div>
+            </dl>
+          </section>
+        </div>
+      </section>
 
-    <!-- Products / stock -->
-    <section id="tab-products" class="tab-panel hidden">
-      <h2>Products</h2>
-      <form id="product-form" class="inline-form">
-        <input type="text" id="product-name" placeholder="Product name" required>
-        <input type="number" id="product-price" placeholder="Price" min="0" step="0.01" required>
-        <input type="number" id="product-stock" placeholder="Stock qty" min="0" step="1" value="0">
-        <button type="submit">Add product</button>
-      </form>
-      <table id="products-table">
-        <thead><tr><th>Name</th><th>Price</th><th>Stock</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+      <section id="page-wallet" class="page" hidden>
+        <header class="page-head">
+          <div><h1>Wallet</h1><p class="sub">Every payment is divided into pots. Spending comes out of the pot you pick.</p></div>
+          <div class="head-actions">
+            <span class="live" id="w-live" data-state="connecting"><span class="live-dot"></span><span id="w-live-text">Connecting</span></span>
+            <button type="button" class="btn secondary" id="w-move"><svg class="icon"><use href="#i-swap"/></svg>Move money</button>
+          </div>
+        </header>
 
-    <!-- Expenses -->
-    <section id="tab-expenses" class="tab-panel hidden">
-      <h2>Expenses</h2>
-      <form id="expense-form" class="inline-form">
-        <input type="text" id="expense-category" placeholder="Category (e.g. rent, supplies)" required>
-        <input type="text" id="expense-description" placeholder="Description (optional)">
-        <input type="number" id="expense-amount" placeholder="Amount" min="0" step="0.01" required>
-        <button type="submit">Add expense</button>
-      </form>
-      <table id="expenses-table">
-        <thead><tr><th>Category</th><th>Description</th><th>Amount</th><th>Date</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
+        <div class="wallet-top">
+          <section class="balance-card">
+            <span class="label">In your wallet</span>
+            <strong class="num" id="w-balance" data-raw="0">KES 0</strong>
+            <p class="runway" id="w-runway"></p>
+            <dl class="mini">
+              <div><dt>Money in today</dt><dd id="w-in" class="in">KES 0</dd></div>
+              <div><dt>Money out today</dt><dd id="w-out" class="out">KES 0</dd></div>
+              <div><dt>Net today</dt><dd id="w-net">KES 0</dd></div>
+            </dl>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Where the money sits</h2></div>
+            <div class="stack stack-lg" id="w-stack" role="img" aria-label="Share of the wallet held by each pot"></div>
+            <div class="sources" id="w-sources"></div>
+          </section>
+        </div>
 
-    <!-- Customers -->
-    <section id="tab-customers" class="tab-panel hidden">
-      <h2>Customers</h2>
-      <form id="customer-form" class="inline-form">
-        <input type="text" id="customer-name" placeholder="Name" required>
-        <input type="text" id="customer-phone" placeholder="Phone (optional)">
-        <button type="submit">Add customer</button>
-      </form>
-      <table id="customers-table">
-        <thead><tr><th>Name</th><th>Phone</th><th>Owes</th><th></th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </section>
-  </main>
-</div>
+        <section class="panel">
+          <div class="panel-head"><h2>Pots</h2><span class="sub" id="w-month-label"></span></div>
+          <div class="pots" id="w-pots"></div>
+        </section>
 
-<!-- Confirm dialog, reused for any destructive action -->
-<div id="confirm-modal" class="modal-backdrop hidden">
-  <div class="modal-card">
-    <p id="confirm-message">Are you sure?</p>
-    <div class="modal-actions">
-      <button id="confirm-cancel" class="secondary">Cancel</button>
-      <button id="confirm-ok" class="danger">Remove</button>
-    </div>
+        <div class="grid-2">
+          <section class="panel">
+            <div class="panel-head"><h2>Money flow, last 24 hours</h2>
+              <span class="legend"><span class="key key-in"></span>In<span class="key key-out"></span>Out</span></div>
+            <div class="flow" id="w-hourly" role="img" aria-label="Money in and out for each of the last 24 hours"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head"><h2>Latest movements</h2></div>
+            <ul class="feed" id="w-feed"></ul>
+          </section>
+        </div>
+
+        <section class="panel" id="rules-panel">
+          <div class="panel-head">
+            <div><h2>Auto-split rules</h2><p class="sub">Changes apply to money you record from now on. Existing balances stay where they are.</p></div>
+          </div>
+          <div class="rules" id="r-list"></div>
+          <div class="rules-foot">
+            <p class="rules-total" id="r-total"></p>
+            <div class="rules-actions">
+              <button type="button" class="btn secondary" id="r-add"><svg class="icon"><use href="#i-plus"/></svg>Add pot</button>
+              <button type="button" class="btn quiet" id="r-reset">Discard changes</button>
+              <button type="button" class="btn primary" id="r-save">Save rules</button>
+            </div>
+          </div>
+          <p class="form-error" id="r-error" role="alert"></p>
+        </section>
+      </section>
+
+      <section id="page-sell" class="page" hidden>
+        <header class="page-head"><div><h1>New sale</h1><p class="sub">Add what the customer is buying, then record how they paid.</p></div></header>
+        <div class="sell-grid">
+          <form class="panel form-panel" id="s-form">
+            <div id="s-items" class="sale-lines"></div>
+            <button type="button" class="btn secondary sm" id="s-add"><svg class="icon"><use href="#i-plus"/></svg>Add another product</button>
+            <div class="field">
+              <label for="s-customer">Customer</label>
+              <select id="s-customer"><option value="">Walk-in customer</option></select>
+              <span class="hint">Needed only if part of the sale goes on credit.</span>
+            </div>
+            <div class="field">
+              <span class="field-label" id="s-method-label">How did they pay?</span>
+              <div class="seg seg-wide" id="s-method" role="radiogroup" aria-labelledby="s-method-label">
+                <button type="button" role="radio" aria-checked="true" data-value="cash">Cash</button>
+                <button type="button" role="radio" aria-checked="false" data-value="mpesa">M-Pesa</button>
+                <button type="button" role="radio" aria-checked="false" data-value="card">Card</button>
+                <button type="button" role="radio" aria-checked="false" data-value="credit">Credit</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="s-paid">Amount paid now (KES)</label>
+              <div class="inline">
+                <input id="s-paid" type="number" min="0" step="0.01" inputmode="decimal" required>
+                <button type="button" class="btn secondary" id="s-paid-full">Paid in full</button>
+              </div>
+            </div>
+            <p class="form-error" id="s-error" role="alert"></p>
+            <button type="submit" class="btn primary lg block" id="s-submit">Complete sale</button>
+          </form>
+
+          <aside class="sale-side">
+            <section class="panel summary">
+              <dl>
+                <div><dt>Sale total</dt><dd id="s-total">KES 0</dd></div>
+                <div><dt>Paid now</dt><dd id="s-paid-now">KES 0</dd></div>
+                <div class="due"><dt>Goes on credit</dt><dd id="s-due">KES 0</dd></div>
+              </dl>
+              <div class="split-preview">
+                <h2>Into your wallet</h2>
+                <ul class="pot-lines" id="s-preview"></ul>
+              </div>
+            </section>
+            <section class="panel"><h2>Recent sales</h2><ul class="rows" id="s-recent"></ul></section>
+          </aside>
+        </div>
+      </section>
+
+      <section id="page-stock" class="page" hidden>
+        <header class="page-head"><div><h1>Stock</h1><p class="sub">What you sell, what it costs customers and how much is left.</p></div></header>
+        <form class="panel form-grid" id="p-form">
+          <div class="field grow"><label for="p-name">Product name</label><input id="p-name" type="text" maxlength="200" required></div>
+          <div class="field"><label for="p-price">Price (KES)</label><input id="p-price" type="number" min="0" step="0.01" inputmode="decimal" required></div>
+          <div class="field"><label for="p-stock">In stock</label><input id="p-stock" type="number" min="0" step="1" value="0" inputmode="numeric"></div>
+          <div class="field"><label for="p-alert">Warn me at</label><input id="p-alert" type="number" min="0" step="1" value="5" inputmode="numeric"></div>
+          <button type="submit" class="btn primary">Add product</button>
+        </form>
+        <div class="table-wrap"><table class="table" id="p-table">
+          <thead><tr><th>Product</th><th class="r">Price</th><th class="r">In stock</th><th class="r">Warn at</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="empty" id="p-empty" hidden>No products yet. Add your first product above and it will appear in new sales.</p>
+      </section>
+
+      <section id="page-expenses" class="page" hidden>
+        <header class="page-head"><div><h1>Expenses</h1><p class="sub">Money that leaves your shop. Each expense comes out of the pot you choose.</p></div></header>
+        <form class="panel form-grid" id="e-form">
+          <div class="field"><label for="e-category">Category</label><input id="e-category" type="text" list="e-categories" maxlength="100" required>
+            <datalist id="e-categories"><option value="Rent"><option value="Supplier"><option value="Transport"><option value="Electricity"><option value="Wages"><option value="Airtime"></datalist></div>
+          <div class="field grow"><label for="e-note">Note (optional)</label><input id="e-note" type="text" maxlength="500"></div>
+          <div class="field"><label for="e-amount">Amount (KES)</label><input id="e-amount" type="number" min="0.01" step="0.01" inputmode="decimal" required></div>
+          <div class="field"><label for="e-pot">Paid from</label><select id="e-pot"></select></div>
+          <button type="submit" class="btn primary">Record expense</button>
+        </form>
+        <div class="table-wrap"><table class="table" id="e-table">
+          <thead><tr><th>Date</th><th>Category</th><th>Note</th><th>Paid from</th><th class="r">Amount</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="empty" id="e-empty" hidden>No expenses yet. When you pay for rent, stock or transport, record it here so your pots stay accurate.</p>
+      </section>
+
+      <section id="page-customers" class="page" hidden>
+        <header class="page-head"><div><h1>Customers</h1><p class="sub">Keep track of who owes you and record what they pay back.</p></div></header>
+        <form class="panel form-grid" id="c-form">
+          <div class="field grow"><label for="c-name">Name</label><input id="c-name" type="text" maxlength="200" required></div>
+          <div class="field grow"><label for="c-phone">Phone (optional)</label><input id="c-phone" type="tel" maxlength="30" inputmode="tel"></div>
+          <button type="submit" class="btn primary">Add customer</button>
+        </form>
+        <div class="table-wrap"><table class="table" id="c-table">
+          <thead><tr><th>Name</th><th>Phone</th><th class="r">Owes you</th><th><span class="sr">Actions</span></th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <p class="empty" id="c-empty" hidden>No customers yet. Add the people you sell to on credit and their balances will show here.</p>
+      </section>
+    </main>
   </div>
+
+  <nav class="tabbar" aria-label="Main">
+    <a href="#/overview" data-route="overview"><svg class="icon"><use href="#i-home"/></svg>Home</a>
+    <a href="#/wallet" data-route="wallet"><svg class="icon"><use href="#i-wallet"/></svg>Wallet</a>
+    <a href="#/sell" data-route="sell"><svg class="icon"><use href="#i-cart"/></svg>Sell</a>
+    <a href="#/stock" data-route="stock"><svg class="icon"><use href="#i-box"/></svg>Stock</a>
+    <a href="#/expenses" data-route="expenses"><svg class="icon"><use href="#i-receipt"/></svg>Expenses</a>
+    <a href="#/customers" data-route="customers"><svg class="icon"><use href="#i-users"/></svg>People</a>
+  </nav>
 </div>
 
-<!-- Payment amount dialog, replaces window.prompt -->
-<div id="payment-modal" class="modal-backdrop hidden">
-  <div class="modal-card">
-    <p>Payment amount received</p>
-    <input type="number" id="payment-amount-input" min="0.01" step="0.01" autofocus>
-    <div class="modal-actions">
-      <button id="payment-cancel" class="secondary">Cancel</button>
-      <button id="payment-ok">Record</button>
-    </div>
-  </div>
-</div>
+<dialog id="dialog" class="dialog"></dialog>
 
-<script src="app.js"></script>
+<script type="module" src="js/main.js"></script>
+<noscript><p class="notice">Bizna needs JavaScript to run. Please turn it on in your browser.</p></noscript>
 </body>
 </html>
